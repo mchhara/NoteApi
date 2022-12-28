@@ -1,9 +1,21 @@
 const express = require('express');
 const router = express.Router();
 
-const noteActons = require('../controllers/api/notes');
+const noteControler = require('../controllers/api/noteController');
 
-router.get('/', noteActons.saveNote);
+
+
+
+//pobieranie wszystkich notatek
+router.get('/notes', noteControler.getAllNotes);
+//pobieranie konkretnej notatki
+router.get('/notes/:id', noteControler.getNote);
+//zapisywanie notatek
+router.post('/notes', noteControler.saveNote);
+//edytowanie notatek
+router.put('/notes/:id', noteControler.editNote);
+//usuwanie notatek
+router.delete('/notes/:id', noteControler.deleteNote);
 
 
 module.exports = router;
