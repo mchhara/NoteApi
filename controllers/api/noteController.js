@@ -1,44 +1,61 @@
 const Note = require('../../db/models/note');
 
 class NoteController {
-    saveNote(req, res){
-
-        // const newNote = new Note({
-        //     title: 'zrobic zakupy',
-        //     body: 'mleko jajka woda'
-        // });
-        
-        // newNote.save().then(() => {
-        //     console.log('notatka została zapisana')
-        // });
-
+    async saveNote(req, res){
         const title = req.body.title;
         const body = req.body.body;
 
-        res.send('Notatka została stworzona. Tytuł: '+ title+ ' Tresć: '+ body);
+
+        let note;
+
+
+        try{
+            note = new Note({title,body});
+            await note.save();
+        }catch(err){
+            return res.status(422).json({message: err.message});
+        }
+
+
+        res.status(201).json(note);
     }
 
 
-    getAllNotes(req,res){
         //pobieranie notatek
-        res.send('Api działa!');
-    }
+    async getAllNotes(req,res){
+            const doc = await Note.find({});
+            res.status(200).json(doc);
+        }
     
-    getNote(req,res){
         //pobieranie konkretnej notatki
-        res.send('Info o notatce');
-    }
-
-    editNote(req,res){
-        //edycja notatki
-        res.send('Notatka zaktualizowana');
-    }
-
-   deleteNote(req,res){
-        //usuwanie notatki
-
+    async getNote(req,res){
         const id = req.params.id;
-        res.send('Notatka usunięta. ID: '+ id);
+        const note = await Note.findOne({ _id: id});
+        res.status(200).json(note);
+    }
+
+
+        //edycja notatki
+    async editNote(req,res){
+        const id = req.params.id;
+        const title = req.body.title;
+        const body = req.body.body;
+
+        const note = await Note.findOne({ _id: id});
+        note.title = title;
+        note.body = body;
+        await note.save();
+
+        res.status(201).json(note);
+    }
+
+
+        //usuwanie notatki
+   async deleteNote(req,res){
+        const id = req.params.id;
+        await Note.deleteOne({ _id: id});
+
+        res.sendStatus(204);
 
    }
 }
