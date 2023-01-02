@@ -3,8 +3,8 @@ import './Notes.css';
 import Note from './Note/Note';
 import NewNote from './NewNote/NewNote';
 import Modal from  'react-modal';
-import EditNote from "../EditNote/EditNote";
-
+import EditNote from "./EditNote/EditNote";
+import axios from '../../axios';
 
 class Notes extends React.Component {
 
@@ -12,40 +12,41 @@ class Notes extends React.Component {
         super(props);
 
         this.state ={
-            notes: [
-                {
-                    id: '2323',
-                    title: 'Wykąpać psa',
-                    body: 'pamietaj aby wykapac psa specjalnym szaponem'
-                },
-                {
-                    id: '4232',
-                    title: 'Zrobic zakupy',
-                    body: 'kupic mleko, masło, likier'
-                }
-            ],
+            notes: [],
+
+            //edit note
             showEditModal: false,
             editNote: {}
         };
     }
     
 
-    deleteNote(id){
+    async deleteNote(id){
         console.log('usuwanie notatki');
         const notes = [...this.state.notes]
-                .filter(note => note.id !== id);
-        this.setState({notes}); 
+                .filter(note => note._id !== id);
+        await axios.delete('/notes'+ id)
+
+        this.setState({ notes }); 
     }
 
-    addNote(note){
+    async addNote(note){
         const notes = [...this.state.notes];
-        notes.push(note);
+        // add to backend
+        const res = await axios.post('/notes', note);
+        const newNote = res.data;
+        //  add to frontend
+        notes.push(newNote);
         this.setState({notes});
     }
     
-    editNote(note){
+    async editNote(note){
+        //edit backend
+        await axios.put('/notes'+ note._id, note);
+
+        //edit frontend
         const notes = [...this.state.notes];
-        const index = notes.findIndex(x => x.id === note.id);
+        const index = notes.findIndex(x => x._id === note._id);
         if (index >=0){
             notes[index] = note; 
             this.setState({notes});
@@ -63,7 +64,23 @@ class Notes extends React.Component {
         this.setState({ editNote: note})
     }
 
-    
+    //łączenie z 
+
+    componentDidMount() {
+        this.fetchNotes();
+    }
+
+    async fetchNotes(){
+        const res = await axios.get('/notes');
+        const notes = res.data;
+
+        this.setState({notes })
+        console.log(res)
+    }
+
+
+
+
     render() {
 
           
@@ -82,7 +99,7 @@ class Notes extends React.Component {
                     <EditNote
                     title = {this.state.editNote.title}
                     body = {this.state.editNote.body}
-                    id = {this.state.editNote.id}
+                    id = {this.state.editNote._id}
 
                     onEdit={note => this.editNote(note)}/>
                     <button onClick ={() => this.toggleModal()}>Anuluj</button>
@@ -92,10 +109,10 @@ class Notes extends React.Component {
 
                 {this.state.notes.map(note =>(
                     <Note 
-                    key ={note.id }
+                    key ={note._id }
                     title= {note.title}
                     body= {note.body}
-                    id = {note.id} 
+                    id = {note._id} 
                     onEdit = {(id) => this.editNoteHandler(note)}
                     onDelete = {(id) => this.deleteNote(id)} />
                     ))}
