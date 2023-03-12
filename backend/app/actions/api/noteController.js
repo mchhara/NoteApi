@@ -5,9 +5,7 @@ class NoteController {
         const title = req.body.title;
         const body = req.body.body;
 
-
         let note;
-
 
         try{
             note = new Note({title,body});

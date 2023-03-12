@@ -5,6 +5,8 @@ import NewNote from './NewNote/NewNote';
 import Modal from  'react-modal';
 import EditNote from "./EditNote/EditNote";
 import axios from '../../axios';
+import {NotificationContainer, NotificationManager} from 'react-notifications';
+import 'react-notifications/lib/notifications.css';
 
 class Notes extends React.Component {
 
@@ -25,7 +27,7 @@ class Notes extends React.Component {
         console.log('usuwanie notatki');
         const notes = [...this.state.notes]
                 .filter(note => note._id !== id);
-        await axios.delete('/notes'+ id)
+        await axios.delete('/notes/'+ id)
 
         this.setState({ notes }); 
     }
@@ -33,16 +35,20 @@ class Notes extends React.Component {
     async addNote(note){
         const notes = [...this.state.notes];
         // add to backend
-        const res = await axios.post('/notes', note);
+       try {
+        const res = await axios.post('/notes/', note);
         const newNote = res.data;
         //  add to frontend
         notes.push(newNote);
-        this.setState({notes});
+        this.setState({ notes });
+    }catch(err){
+    NotificationManager.error(err.response.data.message);
     }
+        }
     
     async editNote(note){
         //edit backend
-        await axios.put('/notes'+ note._id, note);
+        await axios.put('/notes/'+ note._id, note);
 
         //edit frontend
         const notes = [...this.state.notes];
@@ -71,7 +77,7 @@ class Notes extends React.Component {
     }
 
     async fetchNotes(){
-        const res = await axios.get('/notes');
+        const res = await axios.get('/notes/');
         const notes = res.data;
 
         this.setState({notes })
@@ -79,13 +85,14 @@ class Notes extends React.Component {
     }
 
 
-
-
     render() {
 
           
         return(
             <div>
+
+            <NotificationContainer/>
+
                 <p>Moje notatki</p>
 
                 <NewNote

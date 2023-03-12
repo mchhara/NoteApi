@@ -46,7 +46,7 @@ function NewNote(props){
             <button onClick={() => addNote()}>Dodaj notatkę</button> 
             </div>
    ) : (
-    <button onClick ={() => setShowForm(true)}>Nowa notatka</button>
+    <button onClick ={() => setShowForm(true)}>Nowaaaa notatka</button>
    ) 
    );
 }

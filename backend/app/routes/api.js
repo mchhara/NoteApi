@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const noteControler = require('../controllers/api/noteController');
+const noteControler = require('../actions/api/noteController');
 
 
 
